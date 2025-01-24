@@ -3,7 +3,7 @@
 ## Variables
 dot="https://github.com/hallmasonc/dotfiles"
 dotDir="~/.dotfiles"
-rofi="https://github.com/hallmasonc/rofi.git"
+rofi="https://github.com/hallmasonc/rofi"
 rofiDir="~/.config/rofi.git"
 yay="https://aur.archlinux.org/yay.git"
 yayDir="~/yay"
@@ -68,6 +68,11 @@ bash ~/.dotfiles/stowit.sh
 # alacritty theme
 mkdir -p ~/.config/alacritty/themes
 bash ~/.config/alacritty/get-themes.sh 
+
+# rofi theme
+cd $rofiDir
+bash ./setup.sh
+cd -
 
 # Services
 # enable lightdm service
