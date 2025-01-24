@@ -3,7 +3,7 @@
 ## Variables
 dot="https://github.com/hallmasonc/dotfiles"
 dotDir="~/.dotfiles"
-rofi="https://github.com/adi1090x/rofi.git"
+rofi="https://github.com/hallmasonc/rofi.git"
 rofiDir="~/.config/rofi.git"
 yay="https://aur.archlinux.org/yay.git"
 yayDir="~/yay"
@@ -66,6 +66,7 @@ xargs flatpak --user install -y < ./flatpak.txt
 bash ~/.dotfiles/stowit.sh
 
 # alacritty theme
+mkdir -p ~/.config/alacritty/themes
 bash ~/.config/alacritty/get-themes.sh 
 
 # Services
