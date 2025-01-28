@@ -1,5 +1,6 @@
 app.polychromatic.controller
 com.bitwarden.desktop
+com.github.Matoking.protontricks
 com.github.tchx84.Flatseal
 com.vscodium.codium
 io.gitlab.librewolf-community
