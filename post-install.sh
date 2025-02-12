@@ -3,31 +3,24 @@
 ## Variables
 dot="https://github.com/hallmasonc/dotfiles"
 dotDir="~/.dotfiles"
+
 rofi="https://github.com/hallmasonc/rofi"
 rofiDir="~/.config/rofi.git"
+
 yay="https://aur.archlinux.org/yay.git"
 yayDir="~/yay"
 
-## Functions
-# git clone function
-cloneFunction () {
-    git clone $1 $2
-}
-
 ## Main
-# Clone items
+# clone yay
+git clone $yay $yayDir
 
-# yay
-cloneFunction $yay $yayDir
+# clone dotfiles
+git clone $dot $dotDir
 
-# dotfiles
-cloneFunction $dot $dotDir
+# clone rofi
+git clone $rofi $rofiDir
 
-# rofi
-cloneFunction $rofi $rofiDir
-
-# Begin pacman
-# enable multilib repo
+# enable pacman multilib repo
 sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
 
 # force pacman database update
@@ -54,11 +47,10 @@ else
     yay -S --needed - < ./yay.txt
 fi
 
-# Begin flatpak
-# add flathub as remote for flatpaks
+# add flathub as remote for flatpak
 flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# install flatpaks
+# install flatpak applications
 xargs flatpak --user install -y < ./flatpak.txt
 
 # Misc.
@@ -67,7 +59,7 @@ bash ~/.dotfiles/stowit.sh
 
 # alacritty theme
 mkdir -p ~/.config/alacritty/themes
-bash ~/.config/alacritty/get-themes.sh 
+bash ~/.config/alacritty/alacritty-themes.sh 
 
 # rofi theme
 cd $rofiDir
