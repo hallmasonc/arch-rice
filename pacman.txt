@@ -3,6 +3,7 @@ autorandr
 bind
 brightnessctl
 btop
+fastfetch
 feh
 flatpak
 fzf
@@ -19,7 +20,6 @@ lf
 lightdm
 lightdm-gtk-greeter
 locate
-neofetch
 nmap
 nvtop
 openrazer-daemon
@@ -38,6 +38,7 @@ thunar
 tree
 ttf-fira-mono
 ttf-font-awesome
+ttf-meslo-nerd
 ttf-hack
 xdg-user-dirs
 xf86-video-vesa
