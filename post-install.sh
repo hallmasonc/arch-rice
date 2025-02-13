@@ -67,7 +67,7 @@ bash ./setup.sh
 cd -
 
 # zsh theme
-bash ~/.config/zsh/zsh-theme.sh
+bash ~/.config/zsh/zsh-themes.sh
 
 # Services
 # enable lightdm service
