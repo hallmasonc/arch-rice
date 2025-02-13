@@ -5,6 +5,7 @@ brightnessctl
 btop
 feh
 flatpak
+fzf
 git
 github-cli
 gsimplecal

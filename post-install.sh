@@ -66,6 +66,9 @@ cd $rofiDir
 bash ./setup.sh
 cd -
 
+# zsh theme
+bash ~/.config/zsh/zsh-theme.sh
+
 # Services
 # enable lightdm service
 sudo systemctl enable lightdm.service
