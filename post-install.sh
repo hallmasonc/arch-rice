@@ -26,7 +26,7 @@ dotDir="~/.dotfiles"
 rofi="https://github.com/hallmasonc/rofi"
 rofiDir="~/.config/rofi.git"
 yay="https://aur.archlinux.org/yay.git"
-yayDir="~/yay"
+yayDir="~/.yay"
 
 ## main
 # yay
@@ -41,7 +41,7 @@ sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
 # force pacman database update
 sudo pacman -Syy
 # install pacman packages
-sudo pacman -S --needed - < ./pacman.txt
+sudo pacman -S --needed - < ./packages/pacman.txt
 
 # begin yay
 if [ ! -d "$yayDir" ]; then
@@ -55,13 +55,13 @@ else
     # remove yay directory (cleanup)
     rm -rf $yayDir
     # install yay packages
-    yay -S --needed - < ./yay.txt
+    yay -S --needed - < ./packages/yay.txt
 fi
 
 # add flathub as remote for flatpak
 flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo
 # install flatpak applications
-xargs flatpak --user install -y < ./flatpak.txt
+xargs flatpak --user install -y < ./packages/flatpak.txt
 
 ## misc.
 # stow dotfiles
