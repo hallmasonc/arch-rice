@@ -23,14 +23,14 @@ gc () {
 ## variables
 # git remotes and target directories
 dot="https://github.com/hallmasonc/dotfiles"
-dotDir="~/.dotfiles"
+dotDir="$HOME/.dotfiles"
 rofi="https://github.com/adi1090x/rofi"
-rofiDir="~/.config/rofi.git"
+rofiDir="$HOME/.config/rofi.git"
 yay="https://aur.archlinux.org/yay.git"
-yayDir="~/.yay"
+yayDir="$HOME/.yay"
 # rofi style variables
-rlaunch="~/.config/rofi/launchers/type-3/launcher.sh"
-rpower="~/.config/rofi/powermenu/type-1/powermenu.sh"
+rlaunch="$HOME/.config/rofi/launchers/type-3/launcher.sh"
+rpower="$HOME/.config/rofi/powermenu/type-1/powermenu.sh"
 new_theme_launch='style-10'
 new_theme_power='style-3'
 
@@ -71,9 +71,9 @@ xargs flatpak --user install -y < ./packages/flatpak.txt
 
 ## misc.
 # stow dotfiles
-bash ~/.dotfiles/stowit.sh
+bash $HOME/.dotfiles/stowit.sh
 # alacritty theme
-bash ~/.config/alacritty/alacritty-themes.sh 
+bash $HOME/.config/alacritty/alacritty-themes.sh 
 # rofi theme
 cd $rofiDir
 bash ./setup.sh
