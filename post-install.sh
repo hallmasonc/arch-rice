@@ -21,12 +21,18 @@ gc () {
 }
 
 ## variables
+# git remotes and target directories
 dot="https://github.com/hallmasonc/dotfiles"
 dotDir="~/.dotfiles"
-rofi="https://github.com/hallmasonc/rofi"
-rofiDir="~/.config/rofi.git"
+rofi="https://github.com/adi1090x/rofi"
+rofiDir="~/.config/rofi"
 yay="https://aur.archlinux.org/yay.git"
 yayDir="~/.yay"
+# rofi style variables
+rlaunch="~/.config/rofi/scripts/launcher_t3"
+rpower="~/.config/rofi/scripts/powermenu_t1"
+new_theme_launch='style-10'
+new_theme_power='style-3'
 
 ## main
 # yay
@@ -72,6 +78,10 @@ bash ~/.config/alacritty/alacritty-themes.sh
 cd $rofiDir
 bash ./setup.sh
 cd -
+
+# modify rofi themes
+sed -i "s|^theme=.*|theme='${new_theme_launch}'|" $rlaunch
+sed -i "s|^theme=.*|theme='${new_theme_power}'|" $rpower
 
 ## services
 # enable lightdm service
