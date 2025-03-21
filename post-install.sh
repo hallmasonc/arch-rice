@@ -25,7 +25,7 @@ gc () {
 dot="https://github.com/hallmasonc/dotfiles"
 dotDir="~/.dotfiles"
 rofi="https://github.com/adi1090x/rofi"
-rofiDir="~/.config/rofi"
+rofiDir="~/.config/rofi.git"
 yay="https://aur.archlinux.org/yay.git"
 yayDir="~/.yay"
 # rofi style variables
