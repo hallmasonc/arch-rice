@@ -29,8 +29,8 @@ rofiDir="~/.config/rofi.git"
 yay="https://aur.archlinux.org/yay.git"
 yayDir="~/.yay"
 # rofi style variables
-rlaunch="~/.config/rofi/scripts/launcher_t3"
-rpower="~/.config/rofi/scripts/powermenu_t1"
+rlaunch="~/.config/rofi/launchers/type-3/launcher.sh"
+rpower="~/.config/rofi/powermenu/type-1/powermenu.sh"
 new_theme_launch='style-10'
 new_theme_power='style-3'
 
