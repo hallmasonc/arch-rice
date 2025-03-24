@@ -11,15 +11,15 @@ fzf
 git
 github-cli
 gsimplecal
-i3-wm
-i3blocks
-i3lock
-i3status
+sway
+swaybg
+swaylock
+swayidle
 iw
 jq
 lf
 lightdm
-lightdm-gtk-greeter
+lightdm-slick-greeter
 locate
 nmap
 nvtop
@@ -43,5 +43,5 @@ ttf-meslo-nerd
 ttf-hack
 xdg-user-dirs
 xf86-video-vesa
-xorg
+xorg-xwayland
 zsh
