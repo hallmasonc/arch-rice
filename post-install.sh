@@ -1,48 +1,88 @@
 #!/bin/bash
 
-# Variables
-yay="https://aur.archlinux.org/yay.git"
-yayDir="~/yay"
+## prettier echo
+# cosmetics (colors for text).
+BOLD='\e[1m'
+BRED='\e[91m'
+BBLUE='\e[34m'  
+BGREEN='\e[92m'
+BYELLOW='\e[93m'
+RESET='\e[0m'
 
-# Uncomment multilib repo
-sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
-
-# Force pacman database update
-sudo pacman -Syy
-
-# Install pacman packages
-sudo pacman -S --needed - < ./pacman.txt
-
-# Function
-cloneFunction () {
+## functions
+# pretty print
+info_print () {
+    echo -e "${BOLD}${BGREEN}[ ${BYELLOW}•${BGREEN} ] $1${RESET}"
+}
+# git clone
+gc () {
+    info_print "Cloning into: ${2}"
     git clone $1 $2
 }
 
-# Install yay as AUR helper
-cloneFunction $yay $yayDir
+## variables
+# git remotes and target directories
+dot="https://github.com/hallmasonc/dotfiles"
+dotDir="$HOME/.dotfiles"
+rofi="https://github.com/adi1090x/rofi"
+rofiDir="$HOME/.config/rofi.git"
+yay="https://aur.archlinux.org/yay.git"
+yayDir="$HOME/.yay"
+# rofi style variables
+rlaunch="$HOME/.config/rofi/launchers/type-3/launcher.sh"
+rpower="$HOME/.config/rofi/powermenu/type-1/powermenu.sh"
+new_theme_launch='style-10'
+new_theme_power='style-3'
 
+## main
+# yay
+gc $yay $yayDir
+# dotfiles
+gc $dot $dotDir
+# rofi
+gc $rofi $rofiDir
+
+# enable pacman multilib repo
+sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
+# force pacman database update
+sudo pacman -Syy
+# install pacman packages
+sudo pacman -S --needed - < ./packages/pacman.txt
+
+# begin yay
 if [ ! -d "$yayDir" ]; then
     echo "failed to clone yay repo"
 else
-    # Move directory and build
+    # move directory and build
     cd $yayDir
     makepkg --noconfirm -si
-
-    # Move back to previous directory
+    # move back to previous directory
     cd -
-
-    # Remove yay directory (cleanup)
+    # remove yay directory (cleanup)
     rm -rf $yayDir
-
-    # Install yay packages
-    yay -S --needed - < ./yay.txt
+    # install yay packages
+    yay -S --needed - < ./packages/yay.txt
 fi
 
-# Add flathub as remote for flatpaks
+# add flathub as remote for flatpak
 flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo
+# install flatpak applications
+xargs flatpak --user install -y < ./packages/flatpak.txt
 
-# Install flatpaks
-xargs flatpak --user install -y < ./flatpak.txt
+## misc.
+# stow dotfiles
+bash $HOME/.dotfiles/stowit.sh
+# alacritty theme
+bash $HOME/.config/alacritty/alacritty-themes.sh 
+# rofi theme
+cd $rofiDir
+bash ./setup.sh
+cd -
 
-# Enable lightdm service
+# modify rofi themes
+sed -i "s|^theme=.*|theme='${new_theme_launch}'|" $rlaunch
+sed -i "s|^theme=.*|theme='${new_theme_power}'|" $rpower
+
+## services
+# enable lightdm service
 sudo systemctl enable lightdm.service
