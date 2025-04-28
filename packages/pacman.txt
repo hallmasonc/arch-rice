@@ -1,5 +1,4 @@
 alacritty
-autorandr
 bat
 bind
 brightnessctl
@@ -30,7 +29,7 @@ pavucontrol
 pipewire-pulse
 powerline-fonts
 python-openrazer
-rofi
+rofi-wayland
 sof-firmware
 speedtest-cli
 steam
