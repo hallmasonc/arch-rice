@@ -1,7 +1,6 @@
 #!/bin/bash
 
-## prettier echo
-# cosmetics (colors for text).
+# colors for prettier echo
 BOLD='\e[1m'
 BRED='\e[91m'
 BBLUE='\e[34m'  
@@ -9,79 +8,117 @@ BGREEN='\e[92m'
 BYELLOW='\e[93m'
 RESET='\e[0m'
 
+## variables
+dotfiles_repo="https://github.com/hallmasonc/dotfiles"
+dotfiles_dir="$HOME/.dotfiles"
+rofi_repo="https://github.com/adi1090x/rofi"
+rofi_dir="$HOME/.config/rofi.git"
+yay_repo="https://aur.archlinux.org/yay.git"
+yay_dir="$HOME/.yay"
+lightdm_conf="/etc/lightdm/lightdm.conf"
+rofi_launcher="$HOME/.config/rofi/launchers/type-3/launcher.sh"
+rofi_power="$HOME/.config/rofi/powermenu/type-1/powermenu.sh"
+launcher_theme='style-10'
+power_theme='style-3'
+
 ## functions
 # pretty print
 info_print () {
     echo -e "${BOLD}${BGREEN}[ ${BYELLOW}•${BGREEN} ] $1${RESET}"
 }
-# git clone
-gc () {
-    info_print "Cloning into: ${2}"
-    git clone $1 $2
+
+error_print () {
+    echo -e "${BOLD}${BRED}[ ${BBLUE}•${BRED} ] $1${RESET}"
 }
 
-## variables
-# git remotes and target directories
-dot="https://github.com/hallmasonc/dotfiles"
-dotDir="$HOME/.dotfiles"
-rofi="https://github.com/adi1090x/rofi"
-rofiDir="$HOME/.config/rofi.git"
-yay="https://aur.archlinux.org/yay.git"
-yayDir="$HOME/.yay"
-# rofi style variables
-rlaunch="$HOME/.config/rofi/launchers/type-3/launcher.sh"
-rpower="$HOME/.config/rofi/powermenu/type-1/powermenu.sh"
-new_theme_launch='style-10'
-new_theme_power='style-3'
+# git clone
+git_clone () {
+    info_print "Attempting to clone into: $2"
+
+    if git clone $1 $2; then
+        info_print "Clone successful!"
+    else
+        error_print "Clone failed for $1"
+        error_print "Error: $?"
+        exit 1
+    fi
+}
+
+install_pacman_pkgs () {
+    info_print "Updating pacman database..."
+    sudo pacman -Syy
+
+    info_print "Installing pacman packages..."
+    sudo pacman -S --needed - < ./packages/pacman.txt
+}
+
+install_yay_pkgs () {
+    info_print "Installing yay packages..."
+    yay -S --needed - < ./packages/yay.txt
+}
+
+build_source () {
+    info_print "Moving into package directory..."
+    cd $1
+
+    info_print "Building package..."
+    makepkg --noconfirm -si
+
+    info_print "Moving back to previous directory..."
+    cd -
+    
+    info_print "Cleaning up package directory..."
+    rm -rf $1
+}
+
+install_flatpak_pkgs () {
+    info_print "Adding flathub repo..."
+    flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo
+
+    info_print "Installing flatpak packages..."
+    xargs flatpak --user install -y < ./packages/flatpak.txt}
+}
 
 ## main
-# yay
-gc $yay $yayDir
-# dotfiles
-gc $dot $dotDir
-# rofi
-gc $rofi $rofiDir
+# clone repositories
+git_clone $yay_repo $yay_dir
+git_clone $dotfiles_repo $dotfiles_dir
+git_clone $rofi_repo $rofi_dir
 
 # enable pacman multilib repo
 sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
-# force pacman database update
-sudo pacman -Syy
-# install pacman packages
-sudo pacman -S --needed - < ./packages/pacman.txt
 
-# begin yay
-if [ ! -d "$yayDir" ]; then
-    echo "failed to clone yay repo"
-else
-    # move directory and build
-    cd $yayDir
-    makepkg --noconfirm -si
-    # move back to previous directory
-    cd -
-    # remove yay directory (cleanup)
-    rm -rf $yayDir
-    # install yay packages
-    yay -S --needed - < ./packages/yay.txt
-fi
+# install packages
+install_pacman_pkgs
 
-# add flathub as remote for flatpak
-flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo
-# install flatpak applications
-xargs flatpak --user install -y < ./packages/flatpak.txt
+# build yay
+build_source $yay_dir
+
+# install yay packages
+install_yay_pkgs
+
+# install flatpak packages
+install_flatpak_pkgs
 
 ## misc.
 # stow dotfiles
-bash $HOME/.dotfiles/stowit.sh
-# alacritty theme
+bash $dotfiles_dir/stowit.sh
+
+# setup alacritty theme
 bash $HOME/.config/alacritty/alacritty-themes.sh 
-# rofi theme
-cd $rofiDir
+
+# setup rofi theme
+cd $rofi_dir
 bash ./setup.sh
 cd -
 
+# configure lightdm and greeter
+sudo sed -i 's/^#$greeter-session\s*=\s*$.*/\lightdm-slick-greeter/' $lightdm_conf
+sudo sed -i 's/^#$user-session\s*=\s*$.*/\sway/' $lightdm_conf
+
 # modify rofi themes
-sed -i "s|^theme=.*|theme='${new_theme_launch}'|" $rlaunch
-sed -i "s|^theme=.*|theme='${new_theme_power}'|" $rpower
+sed -i "s|^theme=.*|theme='${launcher_theme}'|" $rofi_launcher
+sed -i "s|^theme=.*|theme='${power_theme}'|" $rofi_power
 
 ## services
 # enable lightdm service
