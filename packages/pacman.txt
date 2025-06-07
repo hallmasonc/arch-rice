@@ -14,6 +14,7 @@ sway
 swaybg
 swaylock
 swayidle
+inetutils
 iw
 jq
 lf
@@ -40,6 +41,7 @@ ttf-fira-mono
 ttf-font-awesome
 ttf-meslo-nerd
 ttf-hack
+wireshark-qt
 xdg-user-dirs
 xf86-video-vesa
 xorg-xwayland
