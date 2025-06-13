@@ -113,8 +113,8 @@ bash ./setup.sh
 cd -
 
 # configure lightdm and greeter
-sudo sed -i 's/^#$greeter-session\s*=\s*$.*/\lightdm-slick-greeter/' $lightdm_conf
-sudo sed -i 's/^#$user-session\s*=\s*$.*/\sway/' $lightdm_conf
+sudo sed -i 's/^#*greeter-session\s*=.*/greeter-session=lightdm-slick-greeter/' $lightdm_conf
+sudo sed -i 's/^#*user-session\s*=.*/user-session=sway/' $lightdm_conf
 
 # modify rofi themes
 sed -i "s|^theme=.*|theme='${launcher_theme}'|" $rofi_launcher
