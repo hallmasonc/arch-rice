@@ -10,13 +10,10 @@ fzf
 git
 github-cli
 gsimplecal
-sway
-swaybg
-swaylock
-swayidle
 inetutils
 iw
 jq
+kanshi
 lf
 lightdm
 lightdm-slick-greeter
@@ -35,6 +32,10 @@ sof-firmware
 speedtest-cli
 steam
 stow
+sway
+swaybg
+swayidle
+swaylock
 thunar
 tree
 ttf-fira-mono
