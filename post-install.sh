@@ -76,7 +76,7 @@ install_flatpak_pkgs () {
     flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo
 
     info_print "Installing flatpak packages..."
-    xargs flatpak --user install -y < ./packages/flatpak.txt}
+    xargs flatpak --user install -y < ./packages/flatpak.txt
 }
 
 ## main
