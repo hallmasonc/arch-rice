@@ -114,12 +114,14 @@ cd -
 
 # configure lightdm and greeter
 sudo sed -i 's/^#*greeter-session\s*=.*/greeter-session=lightdm-slick-greeter/' $lightdm_conf
-sudo sed -i 's/^#*user-session\s*=.*/user-session=sway/' $lightdm_conf
 
 # modify rofi themes
 sed -i "s|^theme=.*|theme='${launcher_theme}'|" $rofi_launcher
 sed -i "s|^theme=.*|theme='${power_theme}'|" $rofi_power
 
 ## services
-# enable lightdm service
+# enable global service(s)
 sudo systemctl enable lightdm.service
+
+# enable user services(s)
+systemctl enable --user kanshi.service

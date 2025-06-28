@@ -1,1 +1,2 @@
 bumblebee-status
+sway-systemd

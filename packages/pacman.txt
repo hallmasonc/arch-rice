@@ -25,6 +25,7 @@ openrazer-driver-dkms
 papirus-icon-theme
 pavucontrol
 pipewire-pulse
+power-profiles-daemon
 powerline-fonts
 python-openrazer
 rofi-wayland
@@ -41,10 +42,8 @@ tree
 ttf-fira-mono
 ttf-font-awesome
 ttf-meslo-nerd
-ttf-hack
+waybar
 wireshark-qt
-wlr-randr
 xdg-user-dirs
-xf86-video-vesa
 xorg-xwayland
 zsh
