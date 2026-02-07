@@ -1,12 +1,10 @@
-# Simple Arch Setup and i3wm Rice
+# Simple Arch Setup and Swaywm Rice
 
 ## Why?
 
-I needed a simple way to install applications and setup my i3wm environment
-after such a simple Arch Linux install using [```easy-arch```](https://github.com/hallmasonc/easy-arch) forked from the project
-of the same name by [```classy-giraffe```](https://github.com/classy-giraffe). This repository also bridges the gap
-between post-install Arch Linux and the final configurations found in my [```dotfiles```](https://github.com/hallmasonc/dotfiles)
-repository.
+I needed a simple way to install some base applications and setup my Swaywm environment.
+This repo bridges the gap between a generalized installation script, [```arch-mage```](https://github.com/hallmasonc/arch-mage)
+and a final configurations found in my [```dotfiles```](https://github.com/hallmasonc/dotfiles) repository.
 
 ## TODO
 
@@ -14,7 +12,7 @@ Check the ```TODO.md``` file to view upcoming changes to the repository and prog
 
 ## How to use?
 
-- View the aforementioned ```easy-arch``` and ```dotfiles``` repositories to see how I am setting up my Arch Linux installation.
+- View the aforementioned ```arch-mage``` and ```dotfiles``` repositories to see how I am setting up my Arch Linux installation.
 This will give you more insight into how this script is intended to be used post-install.
 
 - Use the following command to get the latest release of the ```main``` branch:
