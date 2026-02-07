@@ -1,8 +1,7 @@
-app.polychromatic.controller
 com.bitwarden.desktop
-com.github.Matoking.protontricks
 com.github.tchx84.Flatseal
 com.vscodium.codium
+io.github.flattool.Warehouse
 io.gitlab.librewolf-community
-org.mozilla.firefox
+org.pulseaudio.pavucontrol
 org.remmina.Remmina

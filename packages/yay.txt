@@ -1,1 +1,3 @@
-bumblebee-status
+plymouth-theme-monoarch-refined
+sway-systemd
+swaylock-effects

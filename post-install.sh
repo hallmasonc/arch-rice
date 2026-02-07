@@ -1,88 +1,122 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-## prettier echo
-# cosmetics (colors for text).
-BOLD='\e[1m'
-BRED='\e[91m'
-BBLUE='\e[34m'  
-BGREEN='\e[92m'
-BYELLOW='\e[93m'
-RESET='\e[0m'
+## source(s)
+# shellcheck disable=SC1091
+source lib/bash-prints
 
-## functions
-# pretty print
-info_print () {
-    echo -e "${BOLD}${BGREEN}[ ${BYELLOW}•${BGREEN} ] $1${RESET}"
+## variable(s)
+dotfiles_repo="https://github.com/hallmasonc/dotfiles"
+dotfiles_dir="$HOME/.dotfiles"
+yay_repo="https://aur.archlinux.org/yay-bin.git"
+yay_dir="$HOME/.yay"
+
+## function(s)
+git_clone () {
+    info_print "Attempting to clone into: $2"
+
+    if git clone "$1" "$2"; then
+        info_print "Clone successful!"
+    else
+        error_print "Clone failed for $1"
+        exit 1
+    fi
 }
-# git clone
-gc () {
-    info_print "Cloning into: ${2}"
-    git clone $1 $2
+
+install_pacman_pkgs () {
+    # update system and install packages
+    info_print "Upgrading system packages with pacman... "
+    sudo pacman -Syu
+
+    info_print "Installing new packages with pacman... "
+    sudo pacman -S --needed - < packages/pacman.txt
 }
 
-## variables
-# git remotes and target directories
-dot="https://github.com/hallmasonc/dotfiles"
-dotDir="$HOME/.dotfiles"
-rofi="https://github.com/adi1090x/rofi"
-rofiDir="$HOME/.config/rofi.git"
-yay="https://aur.archlinux.org/yay.git"
-yayDir="$HOME/.yay"
-# rofi style variables
-rlaunch="$HOME/.config/rofi/launchers/type-3/launcher.sh"
-rpower="$HOME/.config/rofi/powermenu/type-1/powermenu.sh"
-new_theme_launch='style-10'
-new_theme_power='style-3'
+install_yay_pkgs () {
+    # install packages
+    info_print "Installing new packages with yay... "
+    yay -S --needed - < packages/yay.txt
+}
 
-## main
-# yay
-gc $yay $yayDir
-# dotfiles
-gc $dot $dotDir
-# rofi
-gc $rofi $rofiDir
+install_flatpak_pkgs () {
+    # add flathub repo and install packages
+    info_print "Adding flathub repo for flatpak... "
+    if ! flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo; then
+        info_print "Installing new packages with flatpak... "
+        xargs flatpak --user install -y < packages/flatpak.txt &> /dev/null
+    else
+        error_print "Couldn't add flathub repo for flatpak."
+    fi
+}
 
-# enable pacman multilib repo
-sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
-# force pacman database update
-sudo pacman -Syy
-# install pacman packages
-sudo pacman -S --needed - < ./packages/pacman.txt
+build_source () {
+    # change directory and build
+    cd "$1" &> /dev/null || exit
 
-# begin yay
-if [ ! -d "$yayDir" ]; then
-    echo "failed to clone yay repo"
-else
-    # move directory and build
-    cd $yayDir
+    info_print "Building yay package... "
     makepkg --noconfirm -si
-    # move back to previous directory
-    cd -
-    # remove yay directory (cleanup)
-    rm -rf $yayDir
+
+    # change directory and cleanup
+    cd - &> /dev/null || exit
+    
+    info_print "Cleaning up package directory... "
+    rm -rf "$1"
+}
+
+configure_plymouth () {
+    # configure splash setting for grub and error output only
+    info_print "Configuring GRUB command line w/ splash screen... "
+    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*$/GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3 splash"/' /etc/default/grub
+    sudo grub-mkconfig -o /boot/grub/grub.cfg &> /dev/null
+    
+    # configure mkinitcpio to include plymouth, set theme, and regenerate mkinitcpio
+    if ! grep -q 'plymouth' /etc/mkinitcpio.conf; then
+        info_print "Adding plymouth to mkinitcpio.conf as a new hook... "
+        sudo sed -i 's/\(HOOKS=(systemd\)/\1 plymouth/' /etc/mkinitcpio.conf
+        sudo plymouth-set-default-theme -R monoarch-refined &> /dev/null
+    fi
+}
+
+main () {
+    # clone repositories
+    git_clone $yay_repo "$yay_dir"
+    git_clone $dotfiles_repo "$dotfiles_dir"
+
+    # enable pacman multilib repo
+    sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
+
+    # install pacman packages
+    install_pacman_pkgs
+
+    # build yay
+    build_source "$yay_dir"
+
     # install yay packages
-    yay -S --needed - < ./packages/yay.txt
-fi
+    install_yay_pkgs
 
-# add flathub as remote for flatpak
-flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo
-# install flatpak applications
-xargs flatpak --user install -y < ./packages/flatpak.txt
+    # install flatpak packages
+    install_flatpak_pkgs
 
-## misc.
-# stow dotfiles
-bash $HOME/.dotfiles/stowit.sh
-# alacritty theme
-bash $HOME/.config/alacritty/alacritty-themes.sh 
-# rofi theme
-cd $rofiDir
-bash ./setup.sh
-cd -
+    # stow dotfiles
+    bash "$dotfiles_dir/stowit.sh"
 
-# modify rofi themes
-sed -i "s|^theme=.*|theme='${new_theme_launch}'|" $rlaunch
-sed -i "s|^theme=.*|theme='${new_theme_power}'|" $rpower
+    # setup alacritty theme
+    bash "$HOME/.config/alacritty/alacritty-themes.sh"
 
-## services
-# enable lightdm service
-sudo systemctl enable lightdm.service
+    # setup rofi theme
+    bash "$HOME/.config/rofi/rofi-themes.sh"
+
+    # configure plymouth splash screen
+    configure_plymouth
+
+    ## service(s)
+    # enable user service(s)
+    systemctl enable --user --now kanshi.service &> /dev/null
+    systemctl enable --user --now swayidle.service &> /dev/null
+
+    # enable system service(s)
+    sudo systemctl enable ly@tty1 &> /dev/null
+    sudo systemctl enable --now tuned &> /dev/null
+}
+
+## init main
+main
