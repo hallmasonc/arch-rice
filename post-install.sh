@@ -42,7 +42,7 @@ install_flatpak_pkgs () {
     info_print "Adding flathub repo for flatpak... "
     if ! flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo; then
         info_print "Installing new packages with flatpak... "
-        xargs flatpak --user install -y < packages/flatpak.txt &> /dev/null
+        xargs flatpak --user install --noninteractive < packages/flatpak.txt
     else
         error_print "Couldn't add flathub repo for flatpak."
     fi
@@ -99,11 +99,17 @@ main () {
     # stow dotfiles
     bash "$dotfiles_dir/stowit.sh"
 
+    # setup oh-my-posh
+    curl -s https://ohmyposh.dev/install.sh | bash -s
+
     # setup alacritty theme
     bash "$HOME/.config/alacritty/alacritty-themes.sh"
 
     # setup rofi theme
     bash "$HOME/.config/rofi/rofi-themes.sh"
+
+    # download default wallpaper
+    bash "$HOME/.config/sway/scripts/default-wallpaper.sh"
 
     # configure plymouth splash screen
     configure_plymouth
