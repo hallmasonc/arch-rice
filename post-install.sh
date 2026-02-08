@@ -2,7 +2,7 @@
 
 ## source(s)
 # shellcheck disable=SC1091
-source lib/bash-prints
+source lib/bash-outputs.sh
 
 ## variable(s)
 dotfiles_repo="https://github.com/hallmasonc/dotfiles"
@@ -25,7 +25,7 @@ git_clone () {
 install_pacman_pkgs () {
     # update system and install packages
     info_print "Upgrading system packages with pacman... "
-    sudo pacman -Syu
+    sudo pacman -Syu 
 
     info_print "Installing new packages with pacman... "
     sudo pacman -S --needed - < packages/pacman.txt
