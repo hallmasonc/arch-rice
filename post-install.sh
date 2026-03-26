@@ -40,7 +40,7 @@ install_yay_pkgs () {
 install_flatpak_pkgs () {
     # add flathub repo and install packages
     info_print "Adding flathub repo for flatpak... "
-    if ! flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo; then
+    if flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo; then
         info_print "Installing new packages with flatpak... "
         xargs flatpak --user install --noninteractive < packages/flatpak.txt
     else
@@ -76,13 +76,36 @@ configure_plymouth () {
     fi
 }
 
+multilib_check () {
+    info_print "Checking pacman multilib repository status... "
+    if grep -q "^\[multilib\]" /etc/pacman.conf; then
+        info_print "The multilib repository is already enabled. "
+        return 0
+    else 
+        input_print "The multilib repository is not configured, enable it? (y/N): "
+        read -r user_choice
+
+        case $user_choice in 
+            y|Y)
+                info_print "Enabling the multilib repository... "
+                sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
+                return 0
+                ;;
+            *)
+                info_print "Skipping multilib setup. If prompted again, do enable the repository. "
+                return 1
+                ;;
+        esac
+    fi
+}
+
 main () {
     # clone repositories
     git_clone $yay_repo "$yay_dir"
     git_clone $dotfiles_repo "$dotfiles_dir"
 
     # enable pacman multilib repo
-    sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
+    multilib_check
 
     # install pacman packages
     install_pacman_pkgs
@@ -103,13 +126,13 @@ main () {
     curl -s https://ohmyposh.dev/install.sh | bash -s
 
     # setup alacritty theme
-    bash "$HOME/.config/alacritty/alacritty-themes.sh"
+    . "$HOME/.config/alacritty/alacritty-themes.sh"
 
     # setup rofi theme
-    bash "$HOME/.config/rofi/rofi-themes.sh"
+    . "$HOME/.config/rofi/rofi-themes.sh"
 
     # download default wallpaper
-    bash "$HOME/.config/sway/scripts/default-wallpaper.sh"
+    . "$HOME/.config/sway/scripts/default-wallpaper.sh"
 
     # configure plymouth splash screen
     configure_plymouth
