@@ -13,6 +13,11 @@ info_print () {
     echo -e "${BOLD}${GREEN}[ ${YELLOW}• ${GREEN}] $1${RESET}"
 }
 
+# pretty input
+input_print () {
+    echo -ne "${BOLD}${YELLOW}[ ${GREEN}? ${YELLOW}] $1${RESET}"
+}
+
 # pretty error
 error_print () {
     echo -e "${BOLD}${RED}[ ${YELLOW}! ${RED}] $1${RESET}"
