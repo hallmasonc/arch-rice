@@ -12,13 +12,34 @@ yay_dir="$HOME/.yay"
 
 ## function(s)
 git_clone () {
-    info_print "Attempting to clone into: $2"
+    # check if destination path exists
+    if [[ -d $2 ]]; then
+        info_print "The destination path already exists. Fetching from the remote repository. "
+        
+        # change directory and git fetch and pull
+        cd "$2" &> /dev/null || exit
+        if git fetch &> /dev/null; then
+            if git pull &> /dev/null; then
+                info_print "Successfully pulled down the latest files from remote repository! "
+            else
+                error_print "Couldn't pull latest files from remote repository. "
+            fi
+        else
+            error_print "Unable to fetch from the remote repository. "
+        fi
 
-    if git clone "$1" "$2"; then
-        info_print "Clone successful!"
+        # change directory and continue
+        cd - &> /dev/null || exit
     else
-        error_print "Clone failed for $1"
-        exit 1
+        info_print "Attempting to clone into: $2"
+
+        # clone from remote repository to destination path
+        if git clone "$1" "$2" &> /dev/null; then
+            info_print "Clone successful!"
+        else
+            error_print "Clone failed for $1"
+            exit 1
+        fi
     fi
 }
 
@@ -40,7 +61,7 @@ install_yay_pkgs () {
 install_flatpak_pkgs () {
     # add flathub repo and install packages
     info_print "Adding flathub repo for flatpak... "
-    if flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo; then
+    if flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo &> /dev/null; then
         info_print "Installing new packages with flatpak... "
         xargs flatpak --user install --noninteractive < packages/flatpak.txt
     else
