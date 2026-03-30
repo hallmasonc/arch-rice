@@ -14,13 +14,13 @@ yay_dir="$HOME/.yay"
 git_clone () {
     # check if destination path exists
     if [[ -d $2 ]]; then
-        info_print "The destination path already exists. Fetching from the remote repository. "
+        info_print "The destination path already exists. Fetching from remote: $1  "
         
         # change directory and git fetch and pull
         cd "$2" &> /dev/null || exit
         if git fetch &> /dev/null; then
             if git pull &> /dev/null; then
-                info_print "Successfully pulled down the latest files from remote repository! "
+                info_print "Successfully pulled down the latest files from the remote repository! "
             else
                 error_print "Couldn't pull latest files from remote repository. "
             fi
