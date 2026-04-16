@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
 ## source(s)
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 # shellcheck disable=SC1091
-source lib/bash-outputs.sh
+{
+source "$SCRIPT_DIR/lib/bash-outputs.sh"
+source "$SCRIPT_DIR/lib/git-clone.sh"
+}
 
 ## variable(s)
 dotfiles_repo="https://github.com/hallmasonc/dotfiles"
@@ -11,38 +15,6 @@ yay_repo="https://aur.archlinux.org/yay-bin.git"
 yay_dir="$HOME/.yay"
 
 ## function(s)
-git_clone () {
-    # check if destination path exists
-    if [[ -d $2 ]]; then
-        info_print "The destination path already exists. Fetching from remote: $1  "
-        
-        # change directory and git fetch and pull
-        cd "$2" &> /dev/null || exit
-        if git fetch &> /dev/null; then
-            if git pull &> /dev/null; then
-                info_print "Successfully pulled down the latest files from the remote repository! "
-            else
-                error_print "Couldn't pull latest files from remote repository. "
-            fi
-        else
-            error_print "Unable to fetch from the remote repository. "
-        fi
-
-        # change directory and continue
-        cd - &> /dev/null || exit
-    else
-        info_print "Attempting to clone into: $2"
-
-        # clone from remote repository to destination path
-        if git clone "$1" "$2" &> /dev/null; then
-            info_print "Clone successful!"
-        else
-            error_print "Clone failed for $1"
-            exit 1
-        fi
-    fi
-}
-
 install_pacman_pkgs () {
     # update system and install packages
     info_print "Upgrading system packages with pacman... "
@@ -103,7 +75,7 @@ multilib_check () {
         info_print "The multilib repository is already enabled. "
         return 0
     else 
-        input_print "The multilib repository is not configured, enable it? (y/N): "
+        input_print "The multilib repository is not configured, enable it? (y/n): "
         read -r user_choice
 
         case $user_choice in 
