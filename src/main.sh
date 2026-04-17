@@ -6,6 +6,8 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 {
 source "$SCRIPT_DIR/lib/bash-outputs.sh"
 source "$SCRIPT_DIR/lib/git-clone.sh"
+source "$SCRIPT_DIR/lib/modules.sh"
+source "$SCRIPT_DIR/lib/user-selectors.sh"
 }
 
 ## variable(s)
@@ -15,46 +17,6 @@ yay_repo="https://aur.archlinux.org/yay-bin.git"
 yay_dir="$HOME/.yay"
 
 ## function(s)
-install_pacman_pkgs () {
-    # update system and install packages
-    info_print "Upgrading system packages with pacman... "
-    sudo pacman -Syu 
-
-    info_print "Installing new packages with pacman... "
-    sudo pacman -S --needed - < packages/pacman.txt
-}
-
-install_yay_pkgs () {
-    # install packages
-    info_print "Installing new packages with yay... "
-    yay -S --needed - < packages/yay.txt
-}
-
-install_flatpak_pkgs () {
-    # add flathub repo and install packages
-    info_print "Adding flathub repo for flatpak... "
-    if flatpak remote-add --user flathub https://flathub.org/repo/flathub.flatpakrepo &> /dev/null; then
-        info_print "Installing new packages with flatpak... "
-        xargs flatpak --user install --noninteractive < packages/flatpak.txt
-    else
-        error_print "Couldn't add flathub repo for flatpak."
-    fi
-}
-
-build_source () {
-    # change directory and build
-    cd "$1" &> /dev/null || exit
-
-    info_print "Building yay package... "
-    makepkg --noconfirm -si
-
-    # change directory and cleanup
-    cd - &> /dev/null || exit
-    
-    info_print "Cleaning up package directory... "
-    rm -rf "$1"
-}
-
 configure_plymouth () {
     # configure splash setting for grub and error output only
     info_print "Configuring GRUB command line w/ splash screen... "
@@ -69,45 +31,29 @@ configure_plymouth () {
     fi
 }
 
-multilib_check () {
-    info_print "Checking pacman multilib repository status... "
-    if grep -q "^\[multilib\]" /etc/pacman.conf; then
-        info_print "The multilib repository is already enabled. "
-        return 0
-    else 
-        input_print "The multilib repository is not configured, enable it? (y/n): "
-        read -r user_choice
-
-        case $user_choice in 
-            y|Y)
-                info_print "Enabling the multilib repository... "
-                sudo sed -i "/\[multilib\]/,/Include/"'s/^#*//' /etc/pacman.conf
-                return 0
-                ;;
-            *)
-                info_print "Skipping multilib setup. If prompted again, do enable the repository. "
-                return 1
-                ;;
-        esac
-    fi
-}
-
 main () {
-    # clone repositories
-    git_clone $yay_repo "$yay_dir"
+
+    # clone dotfiles
     git_clone $dotfiles_repo "$dotfiles_dir"
 
     # enable pacman multilib repo
-    multilib_check
+    multilib_selector
 
+    # prompt for server configuration; if function returns false
+    # then install yay AUR helper and AUR packages
+    if ! server_selector; then
+        # clone yay AUR helper
+        git_clone $yay_repo "$yay_dir"
+
+        # build yay
+        build_source "$yay_dir"
+
+        # install yay packages
+        install_yay_pkgs
+    fi
+    
     # install pacman packages
     install_pacman_pkgs
-
-    # build yay
-    build_source "$yay_dir"
-
-    # install yay packages
-    install_yay_pkgs
 
     # install flatpak packages
     install_flatpak_pkgs
